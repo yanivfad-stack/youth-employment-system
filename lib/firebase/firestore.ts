@@ -2,6 +2,7 @@
 // All Firestore imports must be inside functions at runtime
 import { getDbInstance } from './config';
 import type { User, YouthWorker, AttendanceLog } from '@/types';
+import type { QueryDocumentSnapshot, DocumentData } from 'firebase/firestore';
 
 const USERS_COLLECTION = 'users';
 
@@ -163,7 +164,7 @@ export const getUsersByRole = async (role: string): Promise<User[]> => {
     const q = query(collection(db, USERS_COLLECTION), where('role', '==', role));
     const querySnapshot = await getDocs(q);
 
-    return querySnapshot.docs.map((doc) => {
+    return querySnapshot.docs.map((doc: QueryDocumentSnapshot<DocumentData>) => {
       const data = doc.data();
       return {
         ...data,
@@ -198,7 +199,7 @@ export const getAllUsers = async (
 
     return querySnapshot.docs
       .slice(offset, offset + limit)
-      .map((doc) => {
+      .map((doc: QueryDocumentSnapshot<DocumentData>) => {
         const data = doc.data();
         return {
           ...data,
@@ -386,7 +387,7 @@ export const getUserAttendanceLogs = async (
 
     const querySnapshot = await getDocs(q);
 
-    return querySnapshot.docs.map((doc) => {
+    return querySnapshot.docs.map((doc: QueryDocumentSnapshot<DocumentData>) => {
       const data = doc.data();
       return {
         id: doc.id,
@@ -423,7 +424,7 @@ export const getPendingManualAttendanceLogs = async (): Promise<AttendanceLog[]>
 
     const querySnapshot = await getDocs(q);
 
-    return querySnapshot.docs.map((doc) => {
+    return querySnapshot.docs.map((doc: QueryDocumentSnapshot<DocumentData>) => {
       const data = doc.data();
       return {
         id: doc.id,
