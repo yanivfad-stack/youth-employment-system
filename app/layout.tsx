@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import dynamic from "next/dynamic";
+import dynamicImport from "next/dynamic";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
@@ -14,7 +14,7 @@ export const revalidate = 0; // Disable ISR, always render at request time
 // Dynamically import AuthProvider with ssr disabled
 // AuthProvider contains Firebase context which should ONLY initialize in browser
 // By using dynamic with ssr: false, AuthProvider is loaded in browser only
-const AuthProvider = dynamic(
+const AuthProvider = dynamicImport(
   () => import("@/lib/firebase/context").then(mod => ({ default: mod.AuthProvider })),
   {
     ssr: false, // Critical: Do NOT render on server during build
