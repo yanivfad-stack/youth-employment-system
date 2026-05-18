@@ -27,61 +27,94 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const [error, setError] = useState<Error | null>(null);
 
   useEffect(() => {
-    // Only run on client side, never on server
+    // CRITICAL: Only run on client side, never on server or during build
     if (typeof window === 'undefined') {
+      console.log('[AuthProvider] Server-side environment detected - skipping initialization');
       setLoading(false);
       return;
     }
 
-    try {
-      // Check for test mode first
-      const testUser = getTestUser();
-      if (isTestModeEnabled() && testUser) {
-        setFirebaseUser(null);
-        setUser({
-          id: testUser.id,
-          email: testUser.email,
-          name: testUser.name,
-          role: testUser.role,
-          profileImageUrl: testUser.profileImageUrl,
-          phoneNumber: testUser.phoneNumber,
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        });
-        setRole(testUser.role);
-        setLoading(false);
-        return;
-      }
+    let isMounted = true;
 
-      const unsubscribe = onAuthStateChange(async (authUser) => {
-        try {
-          setFirebaseUser(authUser);
-
-          if (authUser) {
-            const userData = await getAuthUserWithRole(authUser);
-            setUser(userData);
-            setRole(userData?.role || null);
-          } else {
-            setUser(null);
-            setRole(null);
+    const initializeAuth = async () => {
+      try {
+        // Check for test mode first
+        const testUser = getTestUser();
+        if (isTestModeEnabled() && testUser) {
+          console.log('[AuthProvider] Test mode enabled, using test user:', testUser.email);
+          if (isMounted) {
+            setFirebaseUser(null);
+            setUser({
+              id: testUser.id,
+              email: testUser.email,
+              name: testUser.name,
+              role: testUser.role,
+              profileImageUrl: testUser.profileImageUrl,
+              phoneNumber: testUser.phoneNumber,
+              createdAt: new Date(),
+              updatedAt: new Date(),
+            });
+            setRole(testUser.role);
+            setLoading(false);
           }
+          return;
+        }
 
-          setError(null);
-        } catch (err) {
-          setError(err instanceof Error ? err : new Error('Auth error'));
-          setUser(null);
-          setRole(null);
-        } finally {
+        console.log('[AuthProvider] Initializing Firebase authentication');
+        const unsubscribe = onAuthStateChange(async (authUser) => {
+          if (!isMounted) return;
+
+          try {
+            setFirebaseUser(authUser);
+
+            if (authUser) {
+              const userData = await getAuthUserWithRole(authUser);
+              if (isMounted) {
+                setUser(userData);
+                setRole(userData?.role || null);
+              }
+            } else {
+              if (isMounted) {
+                setUser(null);
+                setRole(null);
+              }
+            }
+
+            if (isMounted) {
+              setError(null);
+            }
+          } catch (err) {
+            console.error('[AuthProvider] Auth state change error:', err);
+            if (isMounted) {
+              setError(err instanceof Error ? err : new Error('Auth error'));
+              setUser(null);
+              setRole(null);
+            }
+          } finally {
+            if (isMounted) {
+              setLoading(false);
+            }
+          }
+        });
+
+        return () => {
+          isMounted = false;
+          unsubscribe();
+        };
+      } catch (err) {
+        console.warn('[AuthProvider] Initialization error:', err);
+        if (isMounted) {
+          setError(err instanceof Error ? err : new Error('Auth initialization error'));
           setLoading(false);
         }
-      });
+      }
+    };
 
-      return unsubscribe;
-    } catch (err) {
-      console.warn('AuthProvider initialization error:', err);
-      setError(err instanceof Error ? err : new Error('Auth initialization error'));
-      setLoading(false);
-    }
+    initializeAuth();
+
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   const value: AuthContextType = {

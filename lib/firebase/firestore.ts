@@ -1,15 +1,5 @@
-import {
-  doc,
-  getDoc,
-  setDoc,
-  updateDoc,
-  collection,
-  query,
-  where,
-  getDocs,
-  Timestamp,
-  addDoc,
-} from 'firebase/firestore';
+// CRITICAL: Do NOT import from 'firebase/firestore' at module level
+// All Firestore imports must be inside functions at runtime
 import { getDbInstance } from './config';
 import type { User, YouthWorker, AttendanceLog } from '@/types';
 
@@ -19,6 +9,9 @@ const USERS_COLLECTION = 'users';
  * Get user from Firestore by ID
  */
 export const getUserFromFirestore = async (userId: string): Promise<User | null> => {
+  // eslint-disable-next-line global-require
+  const { doc, getDoc } = require('firebase/firestore');
+
   const db = getDbInstance();
   if (!db) {
     console.warn('Firestore is not initialized. Using test mode or configure Firebase.');
@@ -44,6 +37,9 @@ export const getUserFromFirestore = async (userId: string): Promise<User | null>
  * Set user in Firestore (create or update)
  */
 export const setUserInFirestore = async (user: User): Promise<void> => {
+  // eslint-disable-next-line global-require
+  const { doc, getDoc, setDoc, updateDoc, Timestamp } = require('firebase/firestore');
+
   const db = getDbInstance();
   if (!db) {
     console.warn('Firestore is not initialized. Using test mode or configure Firebase.');
@@ -83,6 +79,9 @@ export const setUserInFirestore = async (user: User): Promise<void> => {
  * Update user role in Firestore
  */
 export const updateUserRole = async (userId: string, role: string): Promise<void> => {
+  // eslint-disable-next-line global-require
+  const { doc, updateDoc, Timestamp } = require('firebase/firestore');
+
   const db = getDbInstance();
   if (!db) {
     console.warn('Firestore is not initialized. Using test mode or configure Firebase.');
@@ -106,6 +105,9 @@ export const updateUserRole = async (userId: string, role: string): Promise<void
 export const setYouthWorkerProfile = async (
   youthWorker: YouthWorker
 ): Promise<void> => {
+  // eslint-disable-next-line global-require
+  const { doc, getDoc, setDoc, updateDoc, Timestamp } = require('firebase/firestore');
+
   const db = getDbInstance();
   if (!db) {
     console.warn('Firestore is not initialized. Using test mode or configure Firebase.');
@@ -149,6 +151,9 @@ export const setYouthWorkerProfile = async (
  * Get users by role
  */
 export const getUsersByRole = async (role: string): Promise<User[]> => {
+  // eslint-disable-next-line global-require
+  const { collection, query, where, getDocs } = require('firebase/firestore');
+
   const db = getDbInstance();
   if (!db) {
     console.warn('Firestore is not initialized. Using test mode or configure Firebase.');
@@ -179,6 +184,9 @@ export const getAllUsers = async (
   limit: number = 50,
   offset: number = 0
 ): Promise<User[]> => {
+  // eslint-disable-next-line global-require
+  const { collection, query, getDocs } = require('firebase/firestore');
+
   const db = getDbInstance();
   if (!db) {
     console.warn('Firestore is not initialized. Using test mode or configure Firebase.');
@@ -219,6 +227,9 @@ export const createAttendanceLog = async (
   isManual: boolean = false,
   notes?: string
 ): Promise<string> => {
+  // eslint-disable-next-line global-require
+  const { collection, addDoc, Timestamp } = require('firebase/firestore');
+
   const db = getDbInstance();
   if (!db) {
     throw new Error('Firestore is not initialized');
@@ -268,6 +279,9 @@ export const clockOutAttendanceLog = async (
   longitude: number,
   accuracy: number
 ): Promise<void> => {
+  // eslint-disable-next-line global-require
+  const { doc, getDoc, updateDoc, Timestamp } = require('firebase/firestore');
+
   const db = getDbInstance();
   if (!db) {
     throw new Error('Firestore is not initialized');
@@ -310,6 +324,9 @@ export const clockOutAttendanceLog = async (
 export const getActiveAttendanceLog = async (
   userId: string
 ): Promise<AttendanceLog | null> => {
+  // eslint-disable-next-line global-require
+  const { collection, query, where, getDocs } = require('firebase/firestore');
+
   const db = getDbInstance();
   if (!db) {
     console.warn('Firestore is not initialized. Using test mode or configure Firebase.');
@@ -349,6 +366,9 @@ export const getUserAttendanceLogs = async (
   userId: string,
   days: number = 7
 ): Promise<AttendanceLog[]> => {
+  // eslint-disable-next-line global-require
+  const { collection, query, where, getDocs, Timestamp } = require('firebase/firestore');
+
   const db = getDbInstance();
   if (!db) {
     console.warn('Firestore is not initialized. Using test mode or configure Firebase.');
@@ -387,6 +407,9 @@ export const getUserAttendanceLogs = async (
  * Get manual attendance logs pending approval
  */
 export const getPendingManualAttendanceLogs = async (): Promise<AttendanceLog[]> => {
+  // eslint-disable-next-line global-require
+  const { collection, query, where, getDocs } = require('firebase/firestore');
+
   const db = getDbInstance();
   if (!db) {
     console.warn('Firestore is not initialized. Using test mode or configure Firebase.');
@@ -425,6 +448,9 @@ export const approveManualAttendanceLog = async (
   approved: boolean,
   rejectionReason?: string
 ): Promise<void> => {
+  // eslint-disable-next-line global-require
+  const { doc, updateDoc, Timestamp } = require('firebase/firestore');
+
   const db = getDbInstance();
   if (!db) {
     throw new Error('Firestore is not initialized');
