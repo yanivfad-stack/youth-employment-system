@@ -10,7 +10,6 @@ import "./globals.css";
 // ============================================================================
 export const dynamic = 'force-dynamic';
 export const revalidate = 0; // Disable ISR, always render at request time
-
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
