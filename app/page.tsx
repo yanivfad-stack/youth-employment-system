@@ -58,7 +58,7 @@ export default function Home() {
                   <p className="text-slate-400 text-sm mb-2">תפקיד</p>
                   <div>
                     <span className="inline-block px-4 py-2 rounded-full text-sm font-semibold bg-blue-600 text-white">
-                      {role === 'admin' ? 'מנהל' : role === 'coordinator' ? 'מתאם' : role === 'youth_worker' ? 'עובד צעירים' : role?.replace('_', ' ').toUpperCase()}
+                      {role === 'admin' ? 'מנהל' : role === 'coordinator' ? 'מתאם' : role === 'youth_worker' ? 'עובד צעירים' : (role && role !== 'admin' && role !== 'coordinator' && role !== 'youth_worker') ? role.replace('_', ' ').toUpperCase() : 'משתמש'}
                     </span>
                   </div>
                 </div>
