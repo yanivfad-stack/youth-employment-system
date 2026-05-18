@@ -27,6 +27,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const [error, setError] = useState<Error | null>(null);
 
   useEffect(() => {
+    // Only run on client side, never on server
+    if (typeof window === 'undefined') {
+      setLoading(false);
+      return;
+    }
+
     try {
       // Check for test mode first
       const testUser = getTestUser();
