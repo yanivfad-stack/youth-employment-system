@@ -3,6 +3,9 @@ import dynamic from "next/dynamic";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
+// Skip prerendering - render on demand to avoid Firebase initialization during build
+export const dynamic = 'force-dynamic';
+
 // Dynamically import AuthProvider to prevent eager Firebase initialization during build
 // Using ssr: true but importing lazily allows it to render on server without initializing Firebase
 const AuthProvider = dynamic(() => import("@/lib/firebase/context").then(mod => ({ default: mod.AuthProvider })), {
